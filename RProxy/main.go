@@ -98,9 +98,9 @@ func ConnToConn(conn1,conn2 net.Conn) {
   buffer := make([]byte, 512)
   for {
       n, err := conn1.Read(buffer)
+      log.Println("n:", n);
       log.Println("buffer:", string(buffer[:]));
       if err != nil {
-          log.Println("n:", string(buffer[:]));
           log.Println("Read error:", err);
           break
       }
