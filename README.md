@@ -17,7 +17,7 @@ Create ```docker-compose.yaml``` file
     version: '3'
     services:
      rproxy:
-      image: yeranosyanvahan/rproxy
+      image: yeranosyanvahan/rproxy:0.1.0
       ports:
        - 234:234
       volumes:
@@ -56,7 +56,7 @@ And here is the ```docker-compose.yaml``` File
     version: '3'
     services:
      fproxy:
-      image: yeranosyanvahan/fproxy
+      image: yeranosyanvahan/fproxy:0.1.0
       volumes:
        - ./rproxy.ini:/etc/fproxy/fproxy.ini
       links:

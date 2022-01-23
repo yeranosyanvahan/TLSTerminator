@@ -18,7 +18,7 @@ type Proxy struct {
 
 var Listen int
 var vproxies = map[string]Proxy{}
-const configfile = "/etc/rproxy/rproxy.ini"
+const configfile = "/etc/fproxy/fproxy.ini"
 func main() {
     cfg, err := ini.Load(configfile)
     if err != nil {
