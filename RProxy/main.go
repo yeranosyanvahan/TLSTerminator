@@ -84,13 +84,14 @@ func HandleConnection(ServerName string, clientconn net.Conn) {
   defer clientconn.Close()
   defaultredirect := vproxies["DEFAULT"].Redirect
   specialredirect := vproxies[ServerName].Redirect
+  var redirect string
   if(specialredirect==""){
     log.Println("Connecting To Default Redirect",defaultredirect)
     if(defaultredirect=="") {}
-    redirect := defaultredirect
+    redirect = defaultredirect
   }else {
     log.Println("Connecting To Special Redirect",specialredirect)
-    redirect := specialredirect
+    redirect = specialredirect
   }
 
   serverconn, err := net.Dial("tcp", redirect)
