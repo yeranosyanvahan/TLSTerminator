@@ -61,6 +61,8 @@ And here is the ```docker-compose.yaml``` File
       image: yeranosyanvahan/fproxy:0.1.0
       volumes:
        - ./rproxy.ini:/etc/fproxy/fproxy.ini
+      extra_hosts:
+       - "rproxy:{IP to rproxy}"
       links:
        - application
 
