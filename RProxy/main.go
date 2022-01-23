@@ -97,10 +97,11 @@ func HandleConnection(ServerName string, clientconn net.Conn) {
 func ConnToConn(conn1,conn2 net.Conn) {
   buffer := make([]byte, 512)
   for {
-      _, err := conn1.Read(buffer)
+      n, err := conn1.Read(buffer)
+      log.Println("buffer:", string(buffer[:]));
       if err != nil {
+          log.Println("n:", string(buffer[:]));
           log.Println("Read error:", err);
-          log.Println("buffer:", buffer);
           break
       }
       conn2.Write(buffer)
