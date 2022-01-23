@@ -90,7 +90,7 @@ func ConnToConn(conn1,conn2 net.Conn) {
   for {
       _, err := conn1.Read(buffer)
       if err != nil {
-          log.Println("read error:", err);
+          log.Println("read error:", err); continue 
       }
       conn2.Write(buffer)
   }
