@@ -7,6 +7,7 @@ import (
     "log"
 		"os"
     "net"
+    "io"
 )
 type Proxy struct {
     ServerName string
@@ -95,15 +96,9 @@ func HandleConnection(ServerName string, clientconn net.Conn) {
 
 }
 func ConnToConn(conn1,conn2 net.Conn) {
-  buffer := make([]byte, 512)
-  for {
-      n, err := conn1.Read(buffer)
-      log.Println("n:", n);
-      log.Println("buffer:", string(buffer[:]));
-      if err != nil {
-          log.Println("Read error:", err);
-          break
-      }
-      conn2.Write(buffer)
+  n, err := io.Copy(conn1, conn2)
+  log.Println("n:",n)
+  if err != nil {
+    log.Println("err:", err);
   }
 }
