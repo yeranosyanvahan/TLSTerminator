@@ -26,7 +26,7 @@ Create ```docker-compose.yaml``` file
        - mysql
 
      mysql: # or any other application
-      image: mysql
+      image: mysql:5.7
       environment:
        - MYSQL_ALLOW_EMPTY_PASSWORD=1
 
@@ -35,12 +35,14 @@ To do that Create ```rproxy.ini``` file in the same location
 
     SSLCertificateFile="/etc/rproxy/certs/server.crt"
     SSLCertificateKeyFile="/etc/rproxy/certs/server.key"
-    Redirect="mysql:3306"
     Listen=234
+    [mysql5.7]
+    Redirect="mysql:3306"
 
 Finally Run ```docker-compose up``` command
 
 Voila, you can access your mysql database from 234 port securely
+However, you need to specify mysql5.7 as the hostname you are trying to connect to
 
 ### Client Side
 For client proxy it is basically the same procedure.

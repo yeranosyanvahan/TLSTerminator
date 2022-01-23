@@ -45,7 +45,6 @@ func main() {
 		}
 
     ListenTo(Listen)
-		os.Exit(3)
 }
 
 func ListenTo(ListenPort int) {

@@ -43,9 +43,7 @@ func main() {
       }
       vproxies[ServerName]=proxy
 		}
-
     ListenTo(Listen)
-		os.Exit(3)
 }
 
 func ListenTo(ListenPort int) {
@@ -71,7 +69,6 @@ func ListenTo(ListenPort int) {
           }
           state := tlscon.ConnectionState()
           ServerName := state.ServerName
-          log.Println("New Connection:",ServerName+"@"+conn.RemoteAddr().String()+"/tcp")
           go HandleConnection(ServerName,tlscon)
           }
 
@@ -85,9 +82,20 @@ func HandleCertificates(client *tls.ClientHelloInfo) (*tls.Certificate, error) {
 
 func HandleConnection(ServerName string, clientconn net.Conn) {
   defer clientconn.Close()
-  serverconn, err := net.Dial("tcp", vproxies["DEFAULT"].Redirect)
+  defaultredirect := vproxies["DEFAULT"].Redirect
+  specialredirect := vproxies[ServerName].Redirect
+  if(specialredirect==""){
+    log.Println("Connecting To Default Redirect",defaultredirect)
+    if(defaultredirect=="") {}
+    redirect := defaultredirect
+  }else {
+    log.Println("Connecting To Special Redirect",specialredirect)
+    redirect := specialredirect
+  }
+
+  serverconn, err := net.Dial("tcp", redirect)
   if err != nil {
-  	log.Println("Couldn't connect to",vproxies["DEFAULT"].Redirect);return
+  	log.Println("Couldn't connect to",redirect);return
   }
   defer serverconn.Close()
 
@@ -97,8 +105,8 @@ func HandleConnection(ServerName string, clientconn net.Conn) {
 }
 func ConnToConn(conn1,conn2 net.Conn) {
   n, err := io.Copy(conn1, conn2)
-  log.Println("n:",n)
+  log.Println("CTC n:",n)
   if err != nil {
-    log.Println("err:", err);
+    log.Println("CTC err:", err);
   }
 }
