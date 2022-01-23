@@ -8,7 +8,6 @@ import (
 		"os"
     "net"
 )
-
 type Proxy struct {
     ServerName string
    	Redirect string
@@ -98,20 +97,10 @@ func HandleConnection(ServerName string, clientconn net.Conn) {
 func ConnToConn(conn1,conn2 net.Conn) {
   buffer := make([]byte, 512)
   for {
-      n, err := conn1.Read(buffer)
+      _, err := conn1.Read(buffer)
       if err != nil {
           log.Println("read error:", err); break
       }
       conn2.Write(buffer)
   }
 }
-// func ReadConnToChannel(conn, channel) {
-//   buffer := make([]byte, buffersize)
-//   for {
-//       content, err := conn.Read(buffer)
-//       if err != nil {
-//           log.Println("read error:", err); break
-//       }
-//       channel <- buffer
-//   }
-// }

@@ -1,39 +1,96 @@
 package main
 
 import (
-
+    "gopkg.in/ini.v1"
+    "crypto/tls"
+    "strconv"
+    "log"
+		"os"
+    "net"
 )
+type Proxy struct {
+    ServerName string
+   	Redirect string
+	  SSLCertificateKeyFile string
+		SSLCertificateFile string
+    X509KeyPair tls.Certificate
+}
 
+var Listen int
+var vproxies = map[string]Proxy{}
+const configfile = "/etc/rproxy/rproxy.ini"
 func main() {
-    cert, err := tls.LoadX509KeyPair("certs/client.pem", "certs/client.key")
+    cfg, err := ini.Load(configfile)
     if err != nil {
-        log.Fatalf("server: loadkeys: %s", err)
+        log.Printf("Fail to read file: %v", err);  os.Exit(1)
     }
-    config := tls.Config{Certificates: []tls.Certificate{cert}, InsecureSkipVerify: true}
-    conn, err := tls.Dial("tcp", "127.0.0.1:8000", &config)
+		Listen, err =  cfg.Section("").Key("Listen").Int()
     if err != nil {
-        log.Fatalf("client: dial: %s", err)
+        log.Printf("Invalid Variable Listen: %v", err);  os.Exit(1)
     }
-    defer conn.Close()
-    log.Println("client: connected to: ", conn.RemoteAddr())
 
-    state := conn.ConnectionState()
-    for _, v := range state.PeerCertificates {
-        fmt.Println(x509.MarshalPKIXPublicKey(v.PublicKey))
-        fmt.Println(v.Subject)
-    }
-    log.Println("client: handshake: ", state.HandshakeComplete)
-    log.Println("client: mutual: ", state.NegotiatedProtocolIsMutual)
+		vhosts := cfg.SectionStrings()
+    for _,ServerName := range vhosts {
+			proxy := Proxy{ServerName: ServerName }
+      err = cfg.Section(ServerName).MapTo(&proxy)
+      if proxy.SSLCertificateFile!="" || proxy.SSLCertificateKeyFile!="" {
+        certs, err := tls.LoadX509KeyPair(proxy.SSLCertificateFile, proxy.SSLCertificateKeyFile)
+        if err != nil {
+      		log.Println("ERR",err); os.Exit(1)
+      	}
+        proxy.X509KeyPair=certs
+      }
+      vproxies[ServerName]=proxy
+		}
 
-    message := "Hello\n"
-    n, err := io.WriteString(conn, message)
-    if err != nil {
-        log.Fatalf("client: write: %s", err)
-    }
-    log.Printf("client: wrote %q (%d bytes)", message, n)
+    ListenTo(Listen)
+		os.Exit(3)
+}
 
-    reply := make([]byte, 256)
-    n, err = conn.Read(reply)
-    log.Printf("client: read %q (%d bytes)", string(reply[:n]), n)
-    log.Print("client: exiting")
+func ListenTo(ListenPort int) {
+  log.Println("Listening to:",ListenPort)
+	socket, err := net.Listen("tcp", ":"+strconv.Itoa(ListenPort))
+	if err != nil {
+		log.Println(err); os.Exit(1)
+	}
+  defer socket.Close()
+
+  for {
+      conn, err := socket.Accept()
+      if err != nil {
+          log.Printf("Accept Failure: %s", err); break
+      }
+      defer conn.Close()
+      go HandleConnection(conn)
+  }
+}
+
+func HandleCertificates(client *tls.ClientHelloInfo) (*tls.Certificate, error) {
+    cert := vproxies["DEFAULT"].X509KeyPair
+    return &cert, nil
+}
+
+func HandleConnection(clientconn net.Conn) {
+  defer clientconn.Close()
+  config := &tls.Config{GetCertificate: HandleCertificates}
+  serverconn, err := tls.Dial("tcp", vproxies["DEFAULT"].Redirect, config)
+  if err != nil {
+  	log.Println("Couldn't connect to",vproxies["DEFAULT"].Redirect);return
+  }
+  serverconn.Handshake()
+  defer serverconn.Close()
+
+  go ConnToConn(clientconn,serverconn)
+  ConnToConn(serverconn,clientconn)
+
+}
+func ConnToConn(conn1,conn2 net.Conn) {
+  buffer := make([]byte, 512)
+  for {
+      _, err := conn1.Read(buffer)
+      if err != nil {
+          log.Println("read error:", err); break
+      }
+      conn2.Write(buffer)
+  }
 }
