@@ -49,7 +49,7 @@ func main() {
 
 func ListenTo(ListenPort int) {
   log.Println("Listening to:",ListenPort)
-	config := &tls.Config{GetCertificate: HandleCertificates}
+	config := &tls.Config{GetCertificate: HandleCertificates, InsecureSkipVerify: true}
 	socket, err := tls.Listen("tcp", ":"+strconv.Itoa(ListenPort), config)
 	if err != nil {
 		log.Println(err); os.Exit(1)
