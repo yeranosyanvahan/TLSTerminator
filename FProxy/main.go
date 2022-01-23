@@ -61,6 +61,7 @@ func ListenTo(ListenPort int) {
           log.Printf("Accept Failure: %s", err); break
       }
       defer conn.Close()
+      log.Println("New Connection:","@"+conn.RemoteAddr().String()+"/tcp")
       go HandleConnection(conn)
   }
 }
@@ -72,7 +73,7 @@ func HandleCertificates(client *tls.ClientHelloInfo) (*tls.Certificate, error) {
 
 func HandleConnection(clientconn net.Conn) {
   defer clientconn.Close()
-  config := &tls.Config{GetCertificate: HandleCertificates}
+  config := &tls.Config{GetCertificate: HandleCertificates, InsecureSkipVerify: true}
   serverconn, err := tls.Dial("tcp", vproxies["DEFAULT"].Redirect, config)
   if err != nil {
   	log.Println("Couldn't connect to",vproxies["DEFAULT"].Redirect);return
