@@ -62,7 +62,8 @@ func ListenTo(ListenPort int) {
       }
       defer conn.Close()
       tlscon, ok := conn.(*tls.Conn)
-      if addr, ok := conn.RemoteAddr().(*net.TCPAddr); ok {
+      if ok {
+          addr := conn.RemoteAddr().(*net.TCPAddr)
           err := tlscon.Handshake()
           if(err!=nil){
             log.Printf("TLS handshake error %s", err); continue
