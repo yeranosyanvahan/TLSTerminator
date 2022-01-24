@@ -81,7 +81,7 @@ func (proxy *Proxy) OVERWRITENULL(defaultproxy Proxy) {
 func (proxy *Proxy) CheckConnection(globals Global) error {
 
 	if(global.TLSOUT) {
-		config := &tls.Config{GetCertificate: HandleCertificateOUT}
+		config := &tls.Config{GetCertificate: HandleCertificateOUT, ServerName:proxy.OUT.HostName}
 		serverconn, err := tls.Dial("tcp", proxy.OUT.Addr, config)
 		serverconn.Handshake()
 		serverconn.Close()

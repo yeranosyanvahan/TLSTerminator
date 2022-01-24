@@ -112,7 +112,7 @@ func HandleConnection(clientconn net.Conn) {
 
 	if proxy, ok := vproxies[Port][""]; ok {
 		if(global.TLSOUT) {
-			config := &tls.Config{GetCertificate: HandleCertificateOUT}
+			config := &tls.Config{GetCertificate: HandleCertificateOUT, ServerName:proxy.OUT.HostName}
 			serverconn, err := tls.Dial("tcp", proxy.OUT.Addr, config)
 			if err != nil {
 				log.Println("Couldn't connect to ", proxy.OUT.ToString())
@@ -145,7 +145,7 @@ func HandleTLSConnection(ServerName string, clientconn net.Conn) {
 
 	if proxy, ok := vproxies[Port][ServerName]; ok {
 		if(global.TLSOUT) {
-			config := &tls.Config{GetCertificate: HandleCertificateOUT}
+			config := &tls.Config{GetCertificate: HandleCertificateOUT, ServerName:proxy.OUT.HostName}
 			serverconn, err := tls.Dial("tcp", proxy.OUT.Addr, config)
 			if err != nil {
 				log.Println("Couldn't connect to ", proxy.OUT.ToString())
