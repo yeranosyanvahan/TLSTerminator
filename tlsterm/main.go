@@ -52,7 +52,10 @@ func main() {
 		if(err!= nil){
 			fmt.Println("Error while loading config ::",err); os.Exit(1)
 		}
-
+		err = proxy.CheckConnection(global)
+		if err != nil {
+			fmt.Println("Couldn't connect to '"+proxy.OUT.ToString()+"' server ::",err);
+		}
 		vproxies[proxy.IN.Port] = make(map[string]*Proxy)
 		vproxies[proxy.IN.Port][proxy.IN.HostName] = &proxy
 	}
@@ -110,9 +113,9 @@ func HandleConnection(clientconn net.Conn) {
 	if proxy, ok := vproxies[Port][""]; ok {
 		if(global.TLSOUT) {
 			config := &tls.Config{GetCertificate: HandleCertificateOUT}
-			serverconn, err := tls.Dial("tcp", proxy.IN.Addr, config)
+			serverconn, err := tls.Dial("tcp", proxy.OUT.Addr, config)
 			if err != nil {
-				log.Println("Couldn't connect to ", proxy.IN.ToString())
+				log.Println("Couldn't connect to ", proxy.OUT.ToString())
 				return
 			}
 			serverconn.Handshake()
@@ -120,9 +123,9 @@ func HandleConnection(clientconn net.Conn) {
 			go ConnToConn(clientconn, serverconn)
 			ConnToConn(serverconn, clientconn)
 		}else{
-			serverconn, err := net.Dial("tcp", proxy.IN.Addr)
+			serverconn, err := net.Dial("tcp", proxy.OUT.Addr)
 			if err != nil {
-				log.Println("Couldn't connect to ", proxy.IN.ToString())
+				log.Println("Couldn't connect to ", proxy.OUT.ToString())
 				return
 			}
 			defer serverconn.Close()
@@ -143,9 +146,9 @@ func HandleTLSConnection(ServerName string, clientconn net.Conn) {
 	if proxy, ok := vproxies[Port][ServerName]; ok {
 		if(global.TLSOUT) {
 			config := &tls.Config{GetCertificate: HandleCertificateOUT}
-			serverconn, err := tls.Dial("tcp", proxy.IN.Addr, config)
+			serverconn, err := tls.Dial("tcp", proxy.OUT.Addr, config)
 			if err != nil {
-				log.Println("Couldn't connect to ", proxy.IN.ToString())
+				log.Println("Couldn't connect to ", proxy.OUT.ToString())
 				return
 			}
 			serverconn.Handshake()
@@ -153,9 +156,9 @@ func HandleTLSConnection(ServerName string, clientconn net.Conn) {
 			go ConnToConn(clientconn, serverconn)
 			ConnToConn(serverconn, clientconn)
 		}else{
-			serverconn, err := net.Dial("tcp", proxy.IN.Addr)
+			serverconn, err := net.Dial("tcp", proxy.OUT.Addr)
 			if err != nil {
-				log.Println("Couldn't connect to ", proxy.IN.ToString())
+				log.Println("Couldn't connect to ", proxy.OUT.ToString())
 				return
 			}
 			defer serverconn.Close()

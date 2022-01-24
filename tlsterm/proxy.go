@@ -77,3 +77,19 @@ func (proxy *Proxy) OVERWRITENULL(defaultproxy Proxy) {
 		proxy.Redirect=defaultproxy.Redirect
 	}
 }
+
+func (proxy *Proxy) CheckConnection(globals Global) error {
+
+	if(global.TLSOUT) {
+		config := &tls.Config{GetCertificate: HandleCertificateOUT}
+		serverconn, err := tls.Dial("tcp", proxy.OUT.Addr, config)
+		serverconn.Handshake()
+		serverconn.Close()
+		return err
+	}else{
+		serverconn, err := net.Dial("tcp", proxy.OUT.Addr)
+		serverconn.Close()
+		return err
+	}
+}
+
