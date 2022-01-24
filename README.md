@@ -53,11 +53,8 @@ And here is the ```docker-compose.yaml``` File
       image:yeranosyanvahan/tlsterminator:latest
       volumes:
        - ./tlsterm.ini:/etc/tlsterm/tlsterm.ini
-      extra_hosts:
-       - "rproxy:{IP to rproxy}"
       links:
        - application
-
      application: # your application
       image: yourimage
       environment:
@@ -75,6 +72,7 @@ You need to point redirect to the rproxy server.
     [:3306]
     Redirect="mysql@rproxy.hostname:345"
 
+You can write the IP address instead of rproxy.hostname too
 ### Who is this for?
 This respository is for people who want to access multiple instances of the database from the same endpoint.
 For example if you have 10 databases you can setup proxy to get all the database from single :345 endpoint
