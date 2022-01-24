@@ -16,6 +16,6 @@ jobs:
         DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
       run: docker login -u yeranosyanvahan -p $DOCKER_PASSWORD
     - name: Building TLSTerminator
-      run: docker build ./tlsterm -t yeranosyanvahan/tlsterm:latest
+      run: docker build ./tlsterm -t yeranosyanvahan/tlsterminator:latest
     - name: Pushing TLSTerminator
-      run: docker push yeranosyanvahan/tlsterm:latest
+      run: docker push yeranosyanvahan/tlsterminator:latest
