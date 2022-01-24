@@ -62,13 +62,14 @@ func ListenTo(ListenPort int) {
       }
       defer conn.Close()
       tlscon, ok := conn.(*tls.Conn)
-      if ok {
+      if addr, ok := conn.RemoteAddr().(*net.TCPAddr); ok {
           err := tlscon.Handshake()
           if(err!=nil){
             log.Printf("TLS handshake error %s", err); continue
           }
           state := tlscon.ConnectionState()
           ServerName := state.ServerName
+          log.Println("Client connected: ", ServerName+"@"+addr)
           go HandleConnection(ServerName,tlscon)
           }
 
@@ -84,6 +85,7 @@ func HandleConnection(ServerName string, clientconn net.Conn) {
   defer clientconn.Close()
   defaultredirect := vproxies["DEFAULT"].Redirect
   specialredirect := vproxies[ServerName].Redirect
+  log.Println("Client connected: ", ServerName)
   var redirect string
   if(specialredirect==""){
     log.Println("Connecting To Default Redirect",defaultredirect)
