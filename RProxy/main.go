@@ -69,7 +69,7 @@ func ListenTo(ListenPort int) {
           }
           state := tlscon.ConnectionState()
           ServerName := state.ServerName
-          log.Println("Client connected: ", ServerName+"@"+addr)
+          log.Println("Client connected: ", ServerName+"@",addr)
           go HandleConnection(ServerName,tlscon)
           }
 
