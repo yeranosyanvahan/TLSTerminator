@@ -15,11 +15,7 @@ jobs:
       env:
         DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
       run: docker login -u yeranosyanvahan -p $DOCKER_PASSWORD
-    - name: Building Fproxy
-      run: docker build ./FProxy -t yeranosyanvahan/fproxy:0.1.0
-    - name: Building Rproxy
-      run: docker build ./RProxy -t yeranosyanvahan/rproxy:0.1.0
-    - name: Pushing Fproxy
-      run: docker push yeranosyanvahan/fproxy:0.1.0
-    - name: Pushing Rproxy
-      run: docker push yeranosyanvahan/rproxy:0.1.0
+    - name: Building TLSTerminator
+      run: docker build ./tlsterm -t yeranosyanvahan/tlsterm:latest
+    - name: Pushing TLSTerminator
+      run: docker push yeranosyanvahan/tlsterm:latest

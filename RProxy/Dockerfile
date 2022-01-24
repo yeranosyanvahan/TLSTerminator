@@ -1,7 +1,7 @@
 FROM golang as build
 RUN mkdir $GOPATH/proxy
 WORKDIR /go/src
-ADD ./ /go/src
+ADD ../RProxy /go/src
 RUN go mod init rproxy
 RUN go get
 RUN go build -o bin/rproxy
