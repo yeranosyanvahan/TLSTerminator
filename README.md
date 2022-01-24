@@ -1,66 +1,58 @@
 # TLSTerminator
 
-This is the simplest TLS Termination and Origination Proxy for encrypting EVERY network connection with TLS offloading.
-It requires 2 proxies to be set up: one on the client side and the other is supposed to go on a server.
+This is the simplest TLS Termination and Origination Proxy for encrypting network sockets with TLS offloading.
+Generally, for unsecure applications there needs to be 2 proxies: one for encrypting(TLS Origination) and one for decypting(TLS TERMINATION).
 
-It is now in development.
 The way it works is pretty simple.
-
-
-On server side create a **docker-compose.yaml** file
-
 ## Getting Started
+### TLS Origination Server
 The best way to getting started is through docker [docker and docker-compose](https://docs.docker.com/engine/install/)
 
 Create ```docker-compose.yaml``` file
 
     version: '3'
     services:
-     rproxy:
-      image: yeranosyanvahan/rproxy:0.1.0
+     tlsterminator:
+      image: yeranosyanvahan/tlsterminator:latest
       ports:
-       - 234:234
+       - 345:345
       volumes:
-       - ./rproxy.ini:/etc/rproxy/rproxy.ini
+       - ./tlsterm.ini:/etc/tlsterm/tlsterm.ini
       links:
        - mysql
 
-     mysql: # or any other application
+     mysql: # or any unsecure application
       image: mysql:5.7
       environment:
        - MYSQL_ALLOW_EMPTY_PASSWORD=1
 
-Also you need to specify configuration
-To do that Create ```rproxy.ini``` file in the same location
+Every time the container runs a new certificate and private key are generated in /etc/tlsterm/certs/ directory.
+You MUST explicitly tell where are they located.
+To do that Create ```tlsterm.ini``` file in the same location
 
-    SSLCertificateFile="/etc/rproxy/certs/server.crt"
-    SSLCertificateKeyFile="/etc/rproxy/certs/server.key"
-    Listen=234
-    [mysql5.7]
+    TLSIN=true
+    TLSOUT=false
+
+    SSLCRTINFILE="/etc/tlsterm/certs/server.crt"
+    SSLKEYINFILE="/etc/tlsterm/certs/server.key"
+    
+    [mysql@rproxy.hostname:345]
     Redirect="mysql:3306"
 
 Finally Run ```docker-compose up``` command
 
-Voila, you can access your mysql database from 234 port securely
-However, you need to specify mysql5.7 as the hostname you are trying to connect to
+Voila, you can access your mysql database from 345 port securely.
+To do that you may need tlsterminator TLS Termination Server.
 
-### Client Side
-For client proxy it is basically the same procedure.
-
-    SSLCertificateFile="/etc/fproxy/certs/server.crt"
-    SSLCertificateKeyFile="/etc/fproxy/certs/server.key"
-    Listen: 345
-    Redirect="rproxy:234"
-
-You need to point redirect to the rproxy server.
+### TLS Termination Server
 And here is the ```docker-compose.yaml``` File
 
     version: '3'
     services:
-     fproxy:
-      image: yeranosyanvahan/fproxy:0.1.0
+     tlsterminator:
+      image:yeranosyanvahan/tlsterminator:latest
       volumes:
-       - ./rproxy.ini:/etc/fproxy/fproxy.ini
+       - ./tlsterm.ini:/etc/tlsterm/tlsterm.ini
       extra_hosts:
        - "rproxy:{IP to rproxy}"
       links:
@@ -69,9 +61,20 @@ And here is the ```docker-compose.yaml``` File
      application: # your application
       image: yourimage
       environment:
-       - MYSQL_HOST=fproxy
-       - MYSQL_PORT=345
+       - MYSQL_HOST=tlsterminator
+
+For client proxy it is basically the same procedure.
+You need to point redirect to the rproxy server.
+
+    TLSIN=false
+    TLSOUT=true
+    
+    SSLCRTOUTFILE="/etc/tlsterm/certs/server.crt"
+    SSLKEYOUTFILE="/etc/tlsterm/certs/server.key"
+    
+    [:3306]
+    Redirect="mysql@rproxy.hostname:345"
 
 ### Who is this for?
 This respository is for people who want to access multiple instances of the database from the same endpoint.
-For example if you have 10 databases you can setup proxy to get all the database from single database:234 endpoint
+For example if you have 10 databases you can setup proxy to get all the database from single :345 endpoint
