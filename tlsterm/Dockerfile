@@ -2,7 +2,7 @@ FROM golang as build
 RUN mkdir $GOPATH/proxy
 WORKDIR /go/src
 ADD ./ /go/src
-RUN go mod init tlsterm
+RUN go mod init
 RUN go get
 RUN go build -o bin/tlsterm
 
