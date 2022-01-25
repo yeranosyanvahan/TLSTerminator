@@ -172,7 +172,7 @@ func HandleTLSConnection(ServerName string, clientconn *tls.Conn) {
 	Port := Listen[len(Listen)-1]
 
 	var proxy *Proxy
-	if pseudoproxy, ok := vproxies[Port][""]; ok {
+	if pseudoproxy, ok := vproxies[Port][ServerName]; ok {
 		proxy = pseudoproxy
 		log.Println("Found redirect for this host:", proxy.OUT.ToString())
 	} else {
