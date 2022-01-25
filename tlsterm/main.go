@@ -77,7 +77,7 @@ func main() {
 
 func ListenTo(ListenAddr string) {
 	log.Println("Listening to", ListenAddr)
-	config := &tls.Config{GetCertificate: HandleCertificateIN}
+	config := &tls.Config{GetCertificate: HandleCertificateIN, InsecureSkipVerify: true}
 	socket, err := tls.Listen("tcp", ":"+ListenAddr, config)
 	if err != nil {
 		log.Println(err)
@@ -122,7 +122,7 @@ func HandleConnection(clientconn net.Conn) {
 
 	if proxy, ok := vproxies[Port][""]; ok {
 		if global.TLSOUT {
-			config := &tls.Config{GetCertificate: HandleCertificateOUT, ServerName: proxy.OUT.HostName}
+			config := &tls.Config{GetCertificate: HandleCertificateOUT, ServerName: proxy.OUT.HostName, InsecureSkipVerify: true}
 			serverconn, err := tls.Dial("tcp", proxy.OUT.Addr+":"+proxy.OUT.Port, config)
 			if err != nil {
 				log.Println("Couldn't connect to ", proxy.OUT.ToString())
@@ -155,7 +155,7 @@ func HandleTLSConnection(ServerName string, clientconn net.Conn) {
 
 	if proxy, ok := vproxies[Port][ServerName]; ok {
 		if global.TLSOUT {
-			config := &tls.Config{GetCertificate: HandleCertificateOUT, ServerName: proxy.OUT.HostName}
+			config := &tls.Config{GetCertificate: HandleCertificateOUT, ServerName: proxy.OUT.HostName, InsecureSkipVerify: true}
 			serverconn, err := tls.Dial("tcp", proxy.OUT.Addr, config)
 			if err != nil {
 				log.Println("Couldn't connect to ", proxy.OUT.ToString())
