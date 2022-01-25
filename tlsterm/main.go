@@ -35,7 +35,11 @@ func main() {
 		fmt.Println("Error while loading globals", err)
 		os.Exit(1)
 	}
-	defaultproxy, err = LoadProxy(":0", cfg.Section(""))
+	if cfg.Section("").HasKey("Redirect") {
+		defaultproxy, err = LoadProxy(":0", cfg.Section(""))
+	} else {
+		err = cfg.Section("").MapTo(&defaultproxy)
+	}
 	if err != nil {
 		fmt.Println("Error while loading default host", err)
 		os.Exit(1)
