@@ -48,6 +48,7 @@ func main() {
 	fmt.Println("Loading and Checking configuration")
 	var proxy Proxy
 	for _, host := range vhosts {
+		// Loading Configuration
 		if host == "DEFAULT" {
 			proxy = defaultproxy
 		} else {
@@ -57,7 +58,10 @@ func main() {
 				os.Exit(1)
 			}
 			proxy.OVERWRITENULL(defaultproxy)
+			vproxies[proxy.IN.Port] = make(map[string]*Proxy)
+			vproxies[proxy.IN.Port][proxy.IN.HostName] = &proxy
 		}
+		//Checking configuration
 		err = proxy.CheckSSL(global)
 		if err != nil {
 			fmt.Println("Error while loading '"+host+"' certs", err)
@@ -69,8 +73,6 @@ func main() {
 		} else {
 			log.Println("Successfully connected to '" + proxy.OUT.ToString() + "' host is ready")
 		}
-		vproxies[proxy.IN.Port] = make(map[string]*Proxy)
-		vproxies[proxy.IN.Port][proxy.IN.HostName] = &proxy
 	}
 	for Port, _ := range vproxies {
 		go ListenTo(Port)
