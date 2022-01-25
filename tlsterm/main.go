@@ -61,7 +61,9 @@ func main() {
 		}
 		err = proxy.CheckConnection(global)
 		if err != nil {
-			fmt.Println("Couldn't connect to '"+proxy.OUT.ToString()+"' server ::", err)
+			fmt.Println("Couldn't connect to'", proxy.OUT.ToString(), "'server ::", err)
+		} else {
+			log.Println("Successfully connected to '", proxy.OUT.ToString(), "'host is ready")
 		}
 		vproxies[proxy.IN.Port] = make(map[string]*Proxy)
 		vproxies[proxy.IN.Port][proxy.IN.HostName] = &proxy
@@ -123,10 +125,8 @@ func HandleConnection(clientconn net.Conn) {
 			config := &tls.Config{GetCertificate: HandleCertificateOUT, ServerName: proxy.OUT.HostName}
 			serverconn, err := tls.Dial("tcp", proxy.OUT.Addr+":"+proxy.OUT.Port, config)
 			if err != nil {
-				log.Println("Couldn't connect to", proxy.OUT.ToString(), "continue without checking")
+				log.Println("Couldn't connect to ", proxy.OUT.ToString())
 				return
-			} else {
-				log.Println("Successfully connected to", proxy.OUT.ToString(), "host is ready")
 			}
 			serverconn.Handshake()
 			defer serverconn.Close()
