@@ -152,7 +152,7 @@ func HandleConnection(ServerName string, clientconn net.Conn) {
 		}
 		serverconn.Handshake()
 		defer serverconn.Close()
-		ConnToConn(serverconn, clientconn)
+		ConnToConn(clientconn, serverconn)
 	} else {
 		serverconn, err := net.Dial("tcp", proxy.OUT.Addr+":"+proxy.OUT.Port)
 		if err != nil {
@@ -160,7 +160,7 @@ func HandleConnection(ServerName string, clientconn net.Conn) {
 			return
 		}
 		defer serverconn.Close()
-		ConnToConn(serverconn, clientconn)
+		ConnToConn(clientconn, serverconn)
 
 	}
 }
@@ -176,26 +176,26 @@ func ConnToConn(IN, OUT net.Conn) {
 	var wg sync.WaitGroup
 	wg.Add(2)
 
-	go func() {
-		io.Copy(IN, OUT)
-		if TLSIN, ok := IN.(*tls.Conn); ok {
-			TLSIN.CloseWrite()
-		} else {
-			IN.(*net.TCPConn).CloseWrite()
-		}
-		wg.Done()
-	}()
-	go func() {
-		io.Copy(OUT, IN)
-		if TLSOUT, ok := OUT.(*tls.Conn); ok {
-			TLSOUT.CloseWrite()
-		} else {
-			OUT.(*net.TCPConn).CloseWrite()
-		}
-		wg.Done()
-	}()
-
-	wg.Wait()
+	io.Copy(os.Stdout, IN)
+	//go func() {
+	//	io.Copy(IN, OUT)
+	//	if TLSIN, ok := IN.(*tls.Conn); ok {
+	//		TLSIN.CloseWrite()
+	//	} else {
+	//		IN.(*net.TCPConn).CloseWrite()
+	//	}
+	//	wg.Done()
+	//}()
+	//go func() {
+	//	io.Copy(OUT, IN)
+	//	if TLSOUT, ok := OUT.(*tls.Conn); ok {
+	//		TLSOUT.CloseWrite()
+	//	} else {
+	//		OUT.(*net.TCPConn).CloseWrite()
+	//	}
+	//	wg.Done()
+	//}()
+	//wg.Wait()
 }
 
 func HandleCertificateIN(client *tls.ClientHelloInfo) (*tls.Certificate, error) {
