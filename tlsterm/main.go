@@ -35,9 +35,9 @@ func main() {
 		fmt.Println("Error while loading globals", err)
 		os.Exit(1)
 	}
-	err = cfg.Section("").MapTo(&defaultproxy)
+	defaultproxy, err = LoadProxy(":0", cfg.Section(""))
 	if err != nil {
-		fmt.Println("Error while loading globals", err)
+		fmt.Println("Error while loading default host", err)
 		os.Exit(1)
 	}
 	err = defaultproxy.CheckSSL(global)
@@ -125,8 +125,8 @@ func HandleConnection(clientconn net.Conn) {
 	Port := Listen[len(Listen)-1]
 
 	var proxy *Proxy
-	if checkproxy, ok := vproxies[Port][""]; ok {
-		proxy = checkproxy
+	if pseudoproxy, ok := vproxies[Port][""]; ok {
+		proxy = pseudoproxy
 		log.Println("Found redirect for this host:", proxy.OUT.ToString())
 	} else {
 		proxy = &defaultproxy
@@ -166,8 +166,8 @@ func HandleTLSConnection(ServerName string, clientconn *tls.Conn) {
 	Port := Listen[len(Listen)-1]
 
 	var proxy *Proxy
-	if checkproxy, ok := vproxies[Port][""]; ok {
-		proxy = checkproxy
+	if pseudoproxy, ok := vproxies[Port][""]; ok {
+		proxy = pseudoproxy
 		log.Println("Found redirect for this host:", proxy.OUT.ToString())
 	} else {
 		proxy = &defaultproxy

@@ -23,7 +23,7 @@ func LoadProxy(host string, section *ini.Section) (Proxy, error) {
 	proxy := Proxy{}
 	err := section.MapTo(&proxy)
 	if err != nil {
-		return proxy, errors.New("Error while loading hostname " + err.Error())
+		return proxy, errors.New("Loading Error " + err.Error())
 	}
 	EndpointIN, err := LoadEndpoint(host)
 	if err != nil {
@@ -32,9 +32,6 @@ func LoadProxy(host string, section *ini.Section) (Proxy, error) {
 	EndpointOUT, err := LoadEndpoint(proxy.Redirect)
 	if err != nil {
 		return proxy, err
-	}
-	if err != nil {
-		return proxy, errors.New(host + " Loading Certificate Error " + err.Error())
 	}
 	proxy.IN = EndpointIN
 	proxy.OUT = EndpointOUT
