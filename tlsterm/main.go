@@ -123,8 +123,10 @@ func HandleConnection(clientconn net.Conn) {
 			config := &tls.Config{GetCertificate: HandleCertificateOUT, ServerName: proxy.OUT.HostName}
 			serverconn, err := tls.Dial("tcp", proxy.OUT.Addr+":"+proxy.OUT.Port, config)
 			if err != nil {
-				log.Println("Couldn't connect to ", proxy.OUT.ToString())
+				log.Println("Couldn't connect to ", proxy.OUT.ToString()+" continue without checking")
 				return
+			} else {
+				log.Println("Successfully connected to", proxy.OUT.ToString(), "host is ready")
 			}
 			serverconn.Handshake()
 			defer serverconn.Close()
