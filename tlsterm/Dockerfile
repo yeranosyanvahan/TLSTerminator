@@ -13,4 +13,5 @@ RUN apt-get update && apt-get upgrade -y
 RUN apt-get install openssl libssl-dev -y
 ADD ./before_run.sh /home/proxy/
 COPY --from=build  /go/src/bin/tlsterm /usr/bin/tlsterm
+RUN chmod +x /home/proxy/before_run.sh
 ENTRYPOINT [ "/home/proxy/before_run.sh", "&&", "/usr/bin/tlsterm" ]
