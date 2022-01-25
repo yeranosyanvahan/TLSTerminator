@@ -170,12 +170,13 @@ var numConnections int = 0
 func ConnToConn(IN, OUT net.Conn) {
 	numConnections += 1
 	log.Println("!!Connected!! Number of Connection: ", numConnections)
-	defer log.Println("!!DisConnected!! Number of Connection: ", numConnections)
 	defer func() { numConnections -= 1 }()
+	defer log.Println("!!DisConnected!! Number of Connection: ", numConnections)
 
 	var wg sync.WaitGroup
 	wg.Add(2)
 
+	fmt.Println("Printing to STDOUT")
 	io.Copy(os.Stdout, IN)
 	//go func() {
 	//	io.Copy(IN, OUT)
