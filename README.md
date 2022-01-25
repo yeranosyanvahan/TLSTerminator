@@ -36,6 +36,7 @@ To do that Create ```tlsterm.ini``` file in the same location
     [:3306]
     Redirect="mysql@tlsterm.hostname:345"
 
+You can write the IP address instead of tlsterm.hostname too
 Finally Run ```docker-compose up``` command
 
 Voila, you can access your mysql database from 345 port securely.
@@ -70,10 +71,9 @@ You need to point redirect to the tlsterm proxy server.
     SSLCRTINFILE="/etc/tlsterm/certs/server.crt"
     SSLKEYINFILE="/etc/tlsterm/certs/server.key"
     
-    [mysql@tlsterm.hostname:345]
+    [mysql:345]
     Redirect="mysql:3306"
 
-You can write the IP address instead of tlsterm.hostname too
 ### Who is this for?
 This respository is for people who want to access multiple instances of the database from the same endpoint.
 For example if you have 10 databases you can setup proxy to get all the database from single :345 endpoint
