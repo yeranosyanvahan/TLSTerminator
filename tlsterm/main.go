@@ -88,6 +88,7 @@ func main() {
 func ListenTo(ListenAddr string) {
 	log.Println("Listening to", ListenAddr)
 	var socket net.Listener
+	var err error
 	if global.TLSIN {
 		config := &tls.Config{GetCertificate: HandleCertificateIN, InsecureSkipVerify: true}
 		socket, err = tls.Listen("tcp", ":"+ListenAddr, config)
@@ -112,7 +113,6 @@ func ListenTo(ListenAddr string) {
 		if global.TLSIN {
 			tlscon, ok := conn.(*tls.Conn)
 			if ok {
-
 				err := tlscon.Handshake()
 				if err != nil {
 					log.Printf("TLS handshake error %s", err)
