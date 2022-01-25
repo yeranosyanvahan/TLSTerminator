@@ -13,7 +13,7 @@ Create ```docker-compose.yaml``` file
     version: '3'
     services:
      tlsterminator:
-      image:yeranosyanvahan/tlsterminator:latest
+      image: yeranosyanvahan/tlsterminator:latest
       volumes:
        - ./tlsterm.ini:/etc/tlsterm/tlsterm.ini
       links:
