@@ -147,7 +147,7 @@ func HandleConnection(clientconn net.Conn) {
 	}
 }
 
-func HandleTLSConnection(ServerName string, clientconn net.Conn) {
+func HandleTLSConnection(ServerName string, clientconn *tls.Conn) {
 	defer clientconn.Close()
 	Listen := strings.Split(clientconn.LocalAddr().String(), ":")
 	Port := Listen[len(Listen)-1]
@@ -183,7 +183,7 @@ var numConnections int = 0
 func ConnToConn(IN, OUT net.Conn) {
 	numConnections += 1
 	log.Println("!!Connected!! Number of Connection: ", numConnections)
-	defer log.Println("!!DisConnected!!Number of Connection: ", numConnections)
+	defer log.Println("!!DisConnected!! Number of Connection: ", numConnections)
 	defer func() { numConnections -= 1 }()
 
 	var wg sync.WaitGroup
