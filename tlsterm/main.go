@@ -9,6 +9,7 @@ import (
 	"net"
 	"os"
 	"strings"
+	"sync"
 )
 
 type Global struct {
@@ -130,7 +131,6 @@ func HandleConnection(clientconn net.Conn) {
 			}
 			serverconn.Handshake()
 			defer serverconn.Close()
-			go ConnToConn(clientconn, serverconn)
 			ConnToConn(serverconn, clientconn)
 		} else {
 			serverconn, err := net.Dial("tcp", proxy.OUT.Addr+":"+proxy.OUT.Port)
@@ -139,7 +139,6 @@ func HandleConnection(clientconn net.Conn) {
 				return
 			}
 			defer serverconn.Close()
-			go ConnToConn(clientconn, serverconn)
 			ConnToConn(serverconn, clientconn)
 
 		}
@@ -163,7 +162,6 @@ func HandleTLSConnection(ServerName string, clientconn net.Conn) {
 			}
 			serverconn.Handshake()
 			defer serverconn.Close()
-			go ConnToConn(clientconn, serverconn)
 			ConnToConn(serverconn, clientconn)
 		} else {
 			serverconn, err := net.Dial("tcp", proxy.OUT.Addr+":"+proxy.OUT.Port)
@@ -172,7 +170,6 @@ func HandleTLSConnection(ServerName string, clientconn net.Conn) {
 				return
 			}
 			defer serverconn.Close()
-			go ConnToConn(clientconn, serverconn)
 			ConnToConn(serverconn, clientconn)
 
 		}
@@ -181,12 +178,29 @@ func HandleTLSConnection(ServerName string, clientconn net.Conn) {
 	}
 }
 
+var numConnections int = 0
+
 func ConnToConn(conn1, conn2 net.Conn) {
-	n, err := io.Copy(conn1, conn2)
-	log.Println("CTC n:", n)
-	if err != nil {
-		log.Println("CTC err:", err)
-	}
+	numConnections += 1
+	log.Println("!!Connected!! Number of Connection: ", numConnections)
+	defer log.Println("!!DisConnected!!Number of Connection: ", numConnections)
+	defer func() { numConnections -= 1 }()
+
+	var wg sync.WaitGroup
+	wg.Add(2)
+
+	go func() {
+		io.Copy(conn1, conn2)
+		conn1.(*net.TCPConn).CloseWrite()
+		wg.Done()
+	}()
+	go func() {
+		io.Copy(conn1, conn2)
+		conn2.(*net.TCPConn).CloseWrite()
+		wg.Done()
+	}()
+
+	wg.Wait()
 }
 
 func HandleCertificateIN(client *tls.ClientHelloInfo) (*tls.Certificate, error) {
