@@ -180,7 +180,7 @@ func HandleTLSConnection(ServerName string, clientconn net.Conn) {
 
 var numConnections int = 0
 
-func ConnToConn(conn1, conn2 net.Conn) {
+func ConnToConn(IN, OUT net.Conn) {
 	numConnections += 1
 	log.Println("!!Connected!! Number of Connection: ", numConnections)
 	defer log.Println("!!DisConnected!!Number of Connection: ", numConnections)
@@ -190,13 +190,21 @@ func ConnToConn(conn1, conn2 net.Conn) {
 	wg.Add(2)
 
 	go func() {
-		io.Copy(conn1, conn2)
-		conn1.(*net.TCPConn).CloseWrite()
+		io.Copy(IN, OUT)
+		if TLSIN, ok := IN.(*tls.Conn); ok {
+			TLSIN.CloseWrite()
+		} else {
+			IN.(*net.TCPConn).CloseWrite()
+		}
 		wg.Done()
 	}()
 	go func() {
-		io.Copy(conn1, conn2)
-		conn2.(*net.TCPConn).CloseWrite()
+		io.Copy(OUT, IN)
+		if TLSOUT, ok := OUT.(*tls.Conn); ok {
+			TLSOUT.CloseWrite()
+		} else {
+			OUT.(*net.TCPConn).CloseWrite()
+		}
 		wg.Done()
 	}()
 
