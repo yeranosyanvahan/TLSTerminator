@@ -87,8 +87,14 @@ func main() {
 
 func ListenTo(ListenAddr string) {
 	log.Println("Listening to", ListenAddr)
-	config := &tls.Config{GetCertificate: HandleCertificateIN, InsecureSkipVerify: true}
-	socket, err := tls.Listen("tcp", ":"+ListenAddr, config)
+	var socket net.Listener
+	if global.TLSIN {
+		config := &tls.Config{GetCertificate: HandleCertificateIN, InsecureSkipVerify: true}
+		socket, err = tls.Listen("tcp", ":"+ListenAddr, config)
+	} else {
+		socket, err = net.Listen("tcp", ":"+ListenAddr)
+	}
+
 	if err != nil {
 		log.Println(err)
 		os.Exit(1)
@@ -153,6 +159,7 @@ func HandleConnection(ServerName string, clientconn net.Conn) {
 		serverconn.Handshake()
 		defer serverconn.Close()
 		ConnToConn(clientconn, serverconn)
+
 	} else {
 		serverconn, err := net.Dial("tcp", proxy.OUT.Addr+":"+proxy.OUT.Port)
 		if err != nil {
