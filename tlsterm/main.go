@@ -130,7 +130,11 @@ func HandleConnection(clientconn net.Conn) {
 		log.Println("Found redirect for this host:", proxy.OUT.ToString())
 	} else {
 		proxy = &defaultproxy
-		log.Println("Coulnd't Find redirect for this host, trying default redirect:", proxy.OUT.ToString())
+		if proxy.OUT.Port == "" {
+			log.Println("Could't Find redirect for this host, and no default redirect is found:")
+			return
+		}
+		log.Println("Could't Find redirect for this host, trying default redirect:", proxy.OUT.ToString())
 	}
 
 	if global.TLSOUT {
@@ -162,12 +166,16 @@ func HandleTLSConnection(ServerName string, clientconn *tls.Conn) {
 	Port := Listen[len(Listen)-1]
 
 	var proxy *Proxy
-	if checkproxy, ok := vproxies[Port][ServerName]; ok {
+	if checkproxy, ok := vproxies[Port][""]; ok {
 		proxy = checkproxy
 		log.Println("Found redirect for this host:", proxy.OUT.ToString())
 	} else {
 		proxy = &defaultproxy
-		log.Println("Coulnd't Find redirect for this host, trying default redirect:", proxy.OUT.ToString())
+		if proxy.OUT.Port == "" {
+			log.Println("Could't Find redirect for this host, and no default redirect is found:")
+			return
+		}
+		log.Println("Could't Find redirect for this host, trying default redirect:", proxy.OUT.ToString())
 	}
 
 	if global.TLSOUT {
