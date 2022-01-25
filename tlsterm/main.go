@@ -176,27 +176,25 @@ func ConnToConn(IN, OUT net.Conn) {
 	var wg sync.WaitGroup
 	wg.Add(2)
 
-	fmt.Println("Printing to STDOUT")
-	io.Copy(os.Stdout, IN)
-	//go func() {
-	//	io.Copy(IN, OUT)
-	//	if TLSIN, ok := IN.(*tls.Conn); ok {
-	//		TLSIN.CloseWrite()
-	//	} else {
-	//		IN.(*net.TCPConn).CloseWrite()
-	//	}
-	//	wg.Done()
-	//}()
-	//go func() {
-	//	io.Copy(OUT, IN)
-	//	if TLSOUT, ok := OUT.(*tls.Conn); ok {
-	//		TLSOUT.CloseWrite()
-	//	} else {
-	//		OUT.(*net.TCPConn).CloseWrite()
-	//	}
-	//	wg.Done()
-	//}()
-	//wg.Wait()
+	go func() {
+		io.Copy(IN, OUT)
+		if TLSIN, ok := IN.(*tls.Conn); ok {
+			TLSIN.CloseWrite()
+		} else {
+			IN.(*net.TCPConn).CloseWrite()
+		}
+		wg.Done()
+	}()
+	go func() {
+		io.Copy(OUT, IN)
+		if TLSOUT, ok := OUT.(*tls.Conn); ok {
+			TLSOUT.CloseWrite()
+		} else {
+			OUT.(*net.TCPConn).CloseWrite()
+		}
+		wg.Done()
+	}()
+	wg.Wait()
 }
 
 func HandleCertificateIN(client *tls.ClientHelloInfo) (*tls.Certificate, error) {
