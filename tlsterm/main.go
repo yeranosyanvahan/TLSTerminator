@@ -115,58 +115,17 @@ func ListenTo(ListenAddr string) {
 				state := tlscon.ConnectionState()
 				ServerName := state.ServerName
 				log.Println("Client connected: ", Raddr, "To", ServerName+"@"+Laddr)
-				go HandleTLSConnection(ServerName, tlscon)
+				go HandleConnection(ServerName, tlscon)
 			}
 		} else {
 			log.Println("Client connected: ", Raddr, "To", Laddr)
-			go HandleConnection(conn)
+			go HandleConnection("", conn)
 		}
 
 	}
 }
 
-func HandleConnection(clientconn net.Conn) {
-	defer clientconn.Close()
-	Listen := strings.Split(clientconn.LocalAddr().String(), ":")
-	Port := Listen[len(Listen)-1]
-
-	var proxy *Proxy
-	if pseudoproxy, ok := vproxies[Port][""]; ok {
-		proxy = pseudoproxy
-		log.Println("Found redirect for this host:", proxy.OUT.ToString())
-	} else {
-		proxy = &defaultproxy
-		if proxy.OUT.Port == "" {
-			log.Println("Could't Find redirect for this host, and no default redirect is found:")
-			return
-		}
-		log.Println("Could't Find redirect for this host, trying default redirect:", proxy.OUT.ToString())
-	}
-
-	if global.TLSOUT {
-		config := &tls.Config{GetCertificate: HandleCertificateOUT, ServerName: proxy.OUT.HostName, InsecureSkipVerify: true}
-		serverconn, err := tls.Dial("tcp", proxy.OUT.Addr+":"+proxy.OUT.Port, config)
-		if err != nil {
-			log.Println("Couldn't connect to ", proxy.OUT.ToString())
-			return
-		}
-		serverconn.Handshake()
-		defer serverconn.Close()
-		ConnToConn(serverconn, clientconn)
-	} else {
-		serverconn, err := net.Dial("tcp", proxy.OUT.Addr+":"+proxy.OUT.Port)
-		if err != nil {
-			log.Println("Couldn't connect to ", proxy.OUT.ToString())
-			return
-		}
-		defer serverconn.Close()
-		ConnToConn(serverconn, clientconn)
-
-	}
-
-}
-
-func HandleTLSConnection(ServerName string, clientconn *tls.Conn) {
+func HandleConnection(ServerName string, clientconn net.Conn) {
 	defer clientconn.Close()
 	Listen := strings.Split(clientconn.LocalAddr().String(), ":")
 	Port := Listen[len(Listen)-1]
