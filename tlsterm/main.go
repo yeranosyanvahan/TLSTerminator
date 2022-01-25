@@ -61,9 +61,9 @@ func main() {
 		}
 		err = proxy.CheckConnection(global)
 		if err != nil {
-			fmt.Println("Couldn't connect to'", proxy.OUT.ToString(), "'server ::", err)
+			fmt.Println("Couldn't connect to'"+proxy.OUT.ToString()+"'server ::", err)
 		} else {
-			log.Println("Successfully connected to '", proxy.OUT.ToString(), "'host is ready")
+			log.Println("Successfully connected to '" + proxy.OUT.ToString() + "' host is ready")
 		}
 		vproxies[proxy.IN.Port] = make(map[string]*Proxy)
 		vproxies[proxy.IN.Port][proxy.IN.HostName] = &proxy
