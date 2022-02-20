@@ -52,7 +52,7 @@ func main() {
 	fmt.Println("Loading and Checking configuration")
 	var proxy Proxy
 	for _, host := range vhosts {
-		proxy = make(Proxy)
+		proxy = Proxy{}
 		// Loading Configuration
 		if host == "DEFAULT" {
 			proxy = defaultproxy
@@ -140,7 +140,7 @@ func HandleConnection(ServerName string, clientconn net.Conn) {
 	Port := Listen[len(Listen)-1]
 
 	var proxy *Proxy
-	log.Println("Try connection: ",ServerName+"@"+Port,"vproxies: ", vproxies)
+	log.Println("Try connection: ", ServerName+"@"+Port, "vproxies: ", vproxies)
 	if pseudoproxy, ok := vproxies[Port][ServerName]; ok {
 		proxy = pseudoproxy
 		log.Println("Found redirect for this host:", proxy.OUT.ToString())
