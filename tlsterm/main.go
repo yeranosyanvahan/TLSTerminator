@@ -140,7 +140,6 @@ func HandleConnection(ServerName string, clientconn net.Conn) {
 	Port := Listen[len(Listen)-1]
 
 	var proxy *Proxy
-	log.Println("Try connection: ", ServerName+"@"+Port, "vproxies: ", vproxies)
 	if pseudoproxy, ok := vproxies[Port][ServerName]; ok {
 		proxy = pseudoproxy
 		log.Println("Found redirect for this host:", proxy.OUT.ToString())
