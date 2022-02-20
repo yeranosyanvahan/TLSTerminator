@@ -50,14 +50,14 @@ func main() {
 		os.Exit(1)
 	}
 	fmt.Println("Loading and Checking configuration")
-	var proxy Proxy
+	var proxy *Proxy
 	for _, host := range vhosts {
-		proxy = Proxy{}
+		proxy = new(Proxy)
 		// Loading Configuration
 		if host == "DEFAULT" {
-			proxy = defaultproxy
+			*proxy = defaultproxy
 		} else {
-			proxy, err = LoadProxy(host, cfg.Section(host))
+			*proxy, err = LoadProxy(host, cfg.Section(host))
 			if err != nil {
 				fmt.Println("Error while loading config for '"+host+"'::", err)
 				os.Exit(1)
@@ -66,7 +66,7 @@ func main() {
 			if len(vproxies[proxy.IN.Port]) == 0 { //check if map is empty
 				vproxies[proxy.IN.Port] = make(map[string]*Proxy)
 			}
-			vproxies[proxy.IN.Port][proxy.IN.HostName] = &proxy
+			vproxies[proxy.IN.Port][proxy.IN.HostName] = proxy
 		}
 		//Checking configuration
 		err = proxy.CheckSSL(global)
