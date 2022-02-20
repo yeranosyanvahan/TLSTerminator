@@ -52,7 +52,7 @@ func main() {
 	fmt.Println("Loading and Checking configuration")
 	var proxy Proxy
 	for _, host := range vhosts {
-		proxy = new(Proxy)
+		proxy = new(*Proxy)
 		// Loading Configuration
 		if host == "DEFAULT" {
 			proxy = defaultproxy
