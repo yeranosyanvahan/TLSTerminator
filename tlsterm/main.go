@@ -52,6 +52,7 @@ func main() {
 	fmt.Println("Loading and Checking configuration")
 	var proxy Proxy
 	for _, host := range vhosts {
+		proxy = new(Proxy)
 		// Loading Configuration
 		if host == "DEFAULT" {
 			proxy = defaultproxy
@@ -65,7 +66,6 @@ func main() {
 			if len(vproxies[proxy.IN.Port]) == 0 { //check if map is empty
 				vproxies[proxy.IN.Port] = make(map[string]*Proxy)
 			}
-
 			vproxies[proxy.IN.Port][proxy.IN.HostName] = &proxy
 		}
 		//Checking configuration
