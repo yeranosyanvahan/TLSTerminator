@@ -62,7 +62,10 @@ func main() {
 				os.Exit(1)
 			}
 			proxy.OVERWRITENULL(defaultproxy)
-			vproxies[proxy.IN.Port] = make(map[string]*Proxy)
+			if len(vproxies[proxy.IN.Port]) == 0 { //check if map is empty
+				vproxies[proxy.IN.Port] = make(map[string]*Proxy)
+			}
+
 			vproxies[proxy.IN.Port][proxy.IN.HostName] = &proxy
 		}
 		//Checking configuration
