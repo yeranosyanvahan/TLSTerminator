@@ -12,7 +12,7 @@ type endpoint struct {
 }
 
 func LoadEndpoint(input string) (endpoint, error) {
-	regexpattern := `^([a-z.A-Z]*)@?([a-z.A-Z\d]*):([\d]+)$`
+	regexpattern := `^([-a-z.A-Z]*)@?([-a-z.A-Z\d]*):([\d]+)$`
 	match, _ := regexp.MatchString(regexpattern, input)
 	if !match {
 		return endpoint{}, errors.New("invalid endpoint format for " + input)
