@@ -22,7 +22,7 @@ var vproxies = map[string]map[string]*Proxy{}
 var defaultproxy = Proxy{}
 var global Global
 
-const configfile = "../TLSOrigination.ini"
+const configfile = "/etc/tlsterm/tlsterm.ini"
 
 func main() {
 	cfg, err := ini.Load(configfile)
