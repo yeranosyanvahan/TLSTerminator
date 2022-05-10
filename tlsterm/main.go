@@ -10,6 +10,7 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"time"
 )
 
 type Global struct {
@@ -85,6 +86,7 @@ func main() {
 		go ListenTo(Port)
 	}
 	for {
+		time.Sleep(5)
 	}
 }
 
