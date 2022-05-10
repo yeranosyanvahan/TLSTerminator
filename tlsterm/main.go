@@ -22,7 +22,7 @@ var vproxies = map[string]map[string]*Proxy{}
 var defaultproxy = Proxy{}
 var global Global
 
-const configfile = "/etc/tlsterm/tlsterm.ini"
+const configfile = "../TLSOrigination.ini"
 
 func main() {
 	cfg, err := ini.Load(configfile)
@@ -86,7 +86,7 @@ func main() {
 		go ListenTo(Port)
 	}
 	for {
-		time.Sleep(5)
+		time.Sleep(5 * time.Second)
 	}
 }
 
